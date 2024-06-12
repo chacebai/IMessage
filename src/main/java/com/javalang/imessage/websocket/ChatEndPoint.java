@@ -28,6 +28,22 @@ public class ChatEndPoint {
         System.out.println("接受的长度：" + message.length());
         System.out.println("最大的长度：" + Integer.MAX_VALUE);
         System.out.println("接收的消息是：" + message);
+        broadcastAllUsers(message);
+    }
+
+    private void broadcastAllUsers(String message) {
+        try {
+            //遍历 onlineUsers 集合
+            Set<String> names = onlineUsers.keySet();
+            for (String name : names) {
+                //获取该用户对应的ChatEndpoint对象
+                ChatEndPoint chatEndpoint = onlineUsers.get(name);
+                //发送消息
+                chatEndpoint.session.getBasicRemote().sendText(message);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @OnOpen
@@ -40,7 +56,7 @@ public class ChatEndPoint {
     }
 
     @OnClose
-    public void onClose(Session seesion) {
+    public void onClose(Session session, CloseReason reason) {
         System.out.println("连接关闭了。。。");
         onlineUsers.remove(this.username);
     }

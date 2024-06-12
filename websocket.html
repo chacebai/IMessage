@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSocket Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        #address, #message {
+            width: 300px;
+            padding: 5px;
+            margin: 5px 0;
+        }
+        button {
+            padding: 5px 10px;
+            margin: 5px 0;
+        }
+        #output {
+            margin-top: 10px;
+            border: 1px solid #ccc;
+            padding: 10px;
+            height: 600px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>WebSocket Test</h1>
+    <label for="address">WebSocket Address:</label>
+    <input type="text" id="address" value="ws://localhost:8080/chat" placeholder="ws://localhost:8080/chat">
+    <button id="connect">Connect</button><br>
+    <label for="message">Message:</label>
+    <input type="text" id="message" placeholder="Type your message">
+    <button id="send">Send</button>
+    <div id="output"></div>
+
+    <script>
+        let socket;
+        document.getElementById('connect').addEventListener('click', () => {
+            const address = document.getElementById('address').value;
+            socket = new WebSocket(address);
+
+            socket.onopen = function(event) {
+                log('Connected to ' + address);
+            };
+
+            socket.onmessage = function(event) {
+                log('Received: ' + event.data);
+            };
+
+            socket.onclose = function(event) {
+                log('Disconnected from ' + address);
+            };
+
+            socket.onerror = function(event) {
+                log('Error: ' + event);
+            };
+        });
+
+        document.getElementById('send').addEventListener('click', () => {
+            const message = document.getElementById('message').value;
+            if (socket && socket.readyState === WebSocket.OPEN) {
+                socket.send(message);
+                log('Sent: ' + message);
+            } else {
+                log('WebSocket is not connected.');
+            }
+        });
+
+        function log(message) {
+            const output = document.getElementById('output');
+            const p = document.createElement('p');
+            p.textContent = message;
+            output.appendChild(p);
+        }
+    </script>
+</body>
+</html>
