@@ -2,7 +2,6 @@ package com.javalang.imessage.controller;
 
 import com.javalang.imessage.dto.ResultT;
 import com.javalang.imessage.service.AuthService;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -11,7 +10,6 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.HttpSession;
 import java.util.Map;
 
-@Slf4j
 @RestController
 @RequestMapping("/api/public")
 public class AuthController {

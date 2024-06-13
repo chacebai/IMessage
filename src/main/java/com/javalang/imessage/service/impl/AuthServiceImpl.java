@@ -1,6 +1,5 @@
 package com.javalang.imessage.service.impl;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.javalang.imessage.dto.ResponseResult;
 import com.javalang.imessage.dto.ResultT;

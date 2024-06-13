@@ -1,7 +1,6 @@
 package com.javalang.imessage.service;
 
 import com.javalang.imessage.dto.ResultT;
-import com.javalang.imessage.model.User;
 
 import java.util.Map;
 
