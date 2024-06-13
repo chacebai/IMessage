@@ -31,4 +31,10 @@ public class BasicController {
         return "index.html";
     }
 
+    // http://127.0.0.1:8080/websocket
+    @RequestMapping("/websocket")
+    public String websocket(){
+        return "websocket.html";
+    }
+
 }

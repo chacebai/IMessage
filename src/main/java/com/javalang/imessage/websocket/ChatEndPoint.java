@@ -25,10 +25,18 @@ public class ChatEndPoint {
 
     @OnMessage
     public void onMessage(String message, Session session) {
+        System.out.println("当前的号码：" + session.getId());
         System.out.println("接受的长度：" + message.length());
-        System.out.println("最大的长度：" + Integer.MAX_VALUE);
-        System.out.println("接收的消息是：" + message);
+        String[] res = message.split(" ");
         broadcastAllUsers(message);
+        ChatEndPoint chatEndPoint = onlineUsers.get(res[0]);
+        if (chatEndPoint != null) {
+            try {
+                chatEndPoint.session.getBasicRemote().sendText(res[1]);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     private void broadcastAllUsers(String message) {
