@@ -16,6 +16,7 @@ public class SpringMvcSupport implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(loginInterceptor)
-                .addPathPatterns("/api/user/**");
+                .addPathPatterns("/api/user/**")
+                .addPathPatterns("/api/chat/**");
     }
 }

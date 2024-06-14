@@ -29,7 +29,7 @@
 <body>
     <h1>WebSocket Test</h1>
     <label for="address">Address:</label>
-    <input type="text" id="address" value="ws://localhost:8080/chat" placeholder="ws://localhost:8080/chat">
+    <input type="text" id="address" value="" placeholder="address">
     <button id="connect">Connect</button><br>
     <label for="message">Message:</label>
     <input type="text" id="message" placeholder="Type your message">
@@ -37,6 +37,21 @@
     <div id="output"></div>
 
     <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // 获取当前页面的 URL
+            const currentUrl = window.location.href;
+            // 获取协议、主机名和端口号
+            const url = new URL(currentUrl);
+            const wsProtocol = url.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsUrl = `${wsProtocol}//${url.host}/chat`;
+            // 找到输入框元素
+            const addressInput = document.getElementById('address');
+            // 自动填充 WebSocket 地址到输入框中
+            if (addressInput) {
+                addressInput.value = wsUrl;
+            }
+        });
+
         let socket;
         document.getElementById('connect').addEventListener('click', () => {
             const address = document.getElementById('address').value;

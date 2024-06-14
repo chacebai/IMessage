@@ -1,22 +1,24 @@
 package com.javalang.imessage.websocket;
 
+import com.javalang.imessage.model.User;
 import org.springframework.stereotype.Component;
 
+import javax.servlet.http.HttpSession;
 import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-@ServerEndpoint("/chat")
 @Component
+@ServerEndpoint(value = "/chat",configurator = GetHttpSessionConfigurator.class)
 public class ChatEndPoint {
-
     //用来存储每一个客户端对象对应的ChatEndpoint对象
-    private static Map<String, ChatEndPoint> onlineUsers = new ConcurrentHashMap<>();
-
+    private static final Map<String, ChatEndPoint> onlineUsers = new ConcurrentHashMap<>();
     //和某个客户端连接对象，需要通过他来给客户端发送数据
     private Session session;
+    //httpSession中存储着当前登录的用户名
+    private HttpSession httpSession;
     // 用户名
     private String username;
 
@@ -54,16 +56,46 @@ public class ChatEndPoint {
     @OnOpen
     public void onOpen(Session session, EndpointConfig config) {
         System.out.println("连接打开了。。。");
+        // 需要通知其他的客户端，将所有的用户的用户名发送给客户端
         this.session = session;
-        // 为了简单起见，我们使用会话ID作为用户名
-        this.username = session.getId();
-        onlineUsers.put(username, this);
+        // 获取HttpSession对象
+        HttpSession httpSession = (HttpSession) config.getUserProperties().get(HttpSession.class.getName());
+        if (httpSession != null) {
+            // 将该httpSession赋值给成员httpSession
+            this.httpSession = httpSession;
+            // 为了简单起见，我们使用会话ID作为用户名
+            User user = (User) httpSession.getAttribute("user");
+            if (user != null) {
+                // 获取用户名
+                this.username = user.getId();
+                // 存储该链接对象
+                onlineUsers.put(username, this);
+                // 获取需要推送的消息
+                String message = onlineUsers.keySet().toString();
+                // 广播给所有的用户
+                broadcastAllUsers(message);
+            } else {
+                try {
+                    session.close(new CloseReason(CloseReason.CloseCodes.VIOLATED_POLICY, "Unauthorized"));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        } else {
+            try {
+                session.close(new CloseReason(CloseReason.CloseCodes.VIOLATED_POLICY, "Unauthorized2"));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     @OnClose
     public void onClose(Session session, CloseReason reason) {
         System.out.println("连接关闭了。。。");
-        onlineUsers.remove(this.username);
+        if (this.username != null) {
+            onlineUsers.remove(this.username);
+        }
     }
 
     @OnError

@@ -52,7 +52,7 @@ public class BasicController {
         session.setAttribute("user", user1);
         User user = (User) session.getAttribute("user");
         System.out.println("login user:" + user);
-        return "redirect:/websocket";
+        return "redirect:/api/chat/websocket";
     }
 
     @ResponseBody
@@ -66,6 +66,9 @@ public class BasicController {
     // http://127.0.0.1:8080/websocket用户权限
     @RequestMapping(value = "/websocket")
     public String websocket(HttpSession session) {
+        User user1 = new User();
+        user1.setId("111");
+        session.setAttribute("user", user1);
         // 模拟各种api，访问之前都要检查有没有登录，没有登录就提示用户登录
         User user = (User) session.getAttribute("user");
         System.out.println("websocket user:" + user);
