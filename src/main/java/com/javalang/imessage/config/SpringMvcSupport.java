@@ -1,21 +1,21 @@
 package com.javalang.imessage.config;
 
-import com.javalang.imessage.controller.interceptor.JwtInterceptor;
+import com.javalang.imessage.controller.interceptor.LoginInterceptor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 public class SpringMvcSupport implements WebMvcConfigurer {
-    private final JwtInterceptor jwtInterceptor;
+    private final LoginInterceptor loginInterceptor;
 
-    public SpringMvcSupport(JwtInterceptor jwtInterceptor) {
-        this.jwtInterceptor = jwtInterceptor;
+    public SpringMvcSupport(LoginInterceptor loginInterceptor) {
+        this.loginInterceptor = loginInterceptor;
     }
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(jwtInterceptor)
-                .addPathPatterns("/api/user/**"); // 需要拦截的路径
+        registry.addInterceptor(loginInterceptor)
+                .addPathPatterns("/api/user/**");
     }
 }
