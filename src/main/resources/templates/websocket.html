@@ -78,7 +78,7 @@
             const message = document.getElementById('message').value;
             if (socket && socket.readyState === WebSocket.OPEN) {
                 socket.send(message);
-                log('Sent: ' + message);
+                //log('Sent: ' + message);
             } else {
                 log('WebSocket is not connected.');
             }

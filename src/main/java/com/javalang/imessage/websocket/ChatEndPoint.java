@@ -1,11 +1,13 @@
 package com.javalang.imessage.websocket;
 
+import com.javalang.imessage.dto.ResponseResult;
 import com.javalang.imessage.model.User;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpSession;
 import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -19,22 +21,33 @@ public class ChatEndPoint {
     private Session session;
     //httpSession中存储着当前登录的用户名
     private HttpSession httpSession;
-    // 用户名
-    private String username;
 
     @OnMessage
     public void onMessage(String message, Session session) {
         System.out.println("当前的号码：" + session.getId());
         System.out.println("接受的长度：" + message.length());
-        String[] res = message.split(" ");
-        broadcastAllUsers(message);
-        ChatEndPoint chatEndPoint = onlineUsers.get(res[0]);
-        if (chatEndPoint != null) {
-            try {
-                chatEndPoint.session.getBasicRemote().sendText(res[1]);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+        System.out.println("在线用户:" + onlineUsers.size());
+        // 遍历Map并输出键值对
+        for (Map.Entry<String, ChatEndPoint> entry : onlineUsers.entrySet()) {
+            String username = entry.getKey();
+            ChatEndPoint chatEndPoint = entry.getValue();
+            System.out.println("用户名: " + username + ", ChatEndPoint: " + chatEndPoint);
+        }
+        try {
+            //获取客户端发送来的数据  {"toName":"张三","message":"你好"}
+            //ObjectMapper mapper = new ObjectMapper();
+            //Message mess = mapper.readValue(message, Message.class);
+            //获取当前登录的用户名
+            //String username = (String) httpSession.getAttribute("user");
+            //拼接推送的消息
+            //String data = ResponseResult.wsMessage(false, username, mess.getMessage());
+            //将数据推送给指定的客户端
+            String[] requestMess = message.split(" ");
+            System.out.println("requestMess[0]:" + requestMess[0] + ", requestMess[1]:" + requestMess[1]);
+            ChatEndPoint chatEndpoint = onlineUsers.get(requestMess[0]);
+            chatEndpoint.session.getBasicRemote().sendText(requestMess[1]);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -66,12 +79,10 @@ public class ChatEndPoint {
             // 为了简单起见，我们使用会话ID作为用户名
             User user = (User) httpSession.getAttribute("user");
             if (user != null) {
-                // 获取用户名
-                this.username = user.getId();
                 // 存储该链接对象
-                onlineUsers.put(username, this);
+                onlineUsers.put(user.getId(), this);
                 // 获取需要推送的消息
-                String message = onlineUsers.keySet().toString();
+                String message = ResponseResult.wsMessage(true, null, onlineUsers.keySet());
                 // 广播给所有的用户
                 broadcastAllUsers(message);
             } else {
@@ -93,8 +104,10 @@ public class ChatEndPoint {
     @OnClose
     public void onClose(Session session, CloseReason reason) {
         System.out.println("连接关闭了。。。");
-        if (this.username != null) {
-            onlineUsers.remove(this.username);
+        //获取用户名
+        User user = (User) httpSession.getAttribute("user");
+        if (user != null) {
+            onlineUsers.remove(user.getId());
         }
     }
 
