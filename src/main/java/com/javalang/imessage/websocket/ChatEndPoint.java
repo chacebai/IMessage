@@ -2,6 +2,8 @@ package com.javalang.imessage.websocket;
 
 import com.javalang.imessage.dto.ResponseResult;
 import com.javalang.imessage.model.User;
+import com.javalang.imessage.utils.UserThreadLocal;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpSession;
@@ -12,6 +14,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+@Slf4j
 @Component
 @ServerEndpoint(value = "/chat",configurator = GetHttpSessionConfigurator.class)
 public class ChatEndPoint {
@@ -24,14 +27,14 @@ public class ChatEndPoint {
 
     @OnMessage
     public void onMessage(String message, Session session) {
-        System.out.println("当前的号码：" + session.getId());
-        System.out.println("接受的长度：" + message.length());
-        System.out.println("在线用户:" + onlineUsers.size());
+        log.info("当前的用户：" + session.getId());
+        log.info("接收的长度：" + message.length());
+        log.info("在线用户:" + onlineUsers.size());
         // 遍历Map并输出键值对
         for (Map.Entry<String, ChatEndPoint> entry : onlineUsers.entrySet()) {
             String username = entry.getKey();
             ChatEndPoint chatEndPoint = entry.getValue();
-            System.out.println("用户名: " + username + ", ChatEndPoint: " + chatEndPoint);
+            log.info("用户名: {}, ChatEndPoint: {}",  username, chatEndPoint);
         }
         try {
             //获取客户端发送来的数据  {"toName":"张三","message":"你好"}
@@ -43,9 +46,18 @@ public class ChatEndPoint {
             //String data = ResponseResult.wsMessage(false, username, mess.getMessage());
             //将数据推送给指定的客户端
             String[] requestMess = message.split(" ");
-            System.out.println("requestMess[0]:" + requestMess[0] + ", requestMess[1]:" + requestMess[1]);
-            ChatEndPoint chatEndpoint = onlineUsers.get(requestMess[0]);
-            chatEndpoint.session.getBasicRemote().sendText(requestMess[1]);
+            if (requestMess.length > 1) {
+                log.info("requestMess[0]: {}, requestMess[1]: {}", requestMess[0], requestMess[1]);
+                ChatEndPoint chatEndpoint = onlineUsers.get(requestMess[0]);
+                if (chatEndpoint != null && chatEndpoint.session != null && chatEndpoint.session.getBasicRemote() != null) {
+                    chatEndpoint.session.getBasicRemote().sendText(requestMess[1]);
+                } else {
+                    log.warn("chatEndpoint:" + chatEndpoint);
+                    this.session.getBasicRemote().sendText("ChatEndPoint NullPointer");
+                }
+            } else {
+                log.info("requestMess[1] is null");
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -68,10 +80,11 @@ public class ChatEndPoint {
 
     @OnOpen
     public void onOpen(Session session, EndpointConfig config) {
-        System.out.println("连接打开了。。。");
+        log.info("连接打开了。。。");
         // 需要通知其他的客户端，将所有的用户的用户名发送给客户端
         this.session = session;
         // 获取HttpSession对象
+        log.info("onOpen UserThreadLocal:" + UserThreadLocal.get());
         HttpSession httpSession = (HttpSession) config.getUserProperties().get(HttpSession.class.getName());
         if (httpSession != null) {
             // 将该httpSession赋值给成员httpSession

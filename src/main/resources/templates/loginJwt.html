@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>登录</title>
+    <script src="./js/axios.min.1.7.2.js"></script>
+</head>
+<body>
+<form id="loginForm">
+    <label for="username">用户名:</label>
+    <input type="text" id="username" name="username"><br>
+    <label for="password">密码:</label>
+    <input type="password" id="password" name="password"><br>
+    <button type="button" onclick="submitForm()">登录</button>
+    <p id="error" style="color: red;"></p>
+</form>
+
+<script>
+    function submitForm() {
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+        const errorElement = document.getElementById('error');
+
+        axios.post('/doLoginJwt', {
+            username: username,
+            password: password
+        })
+            .then(response => {
+                if (response.data.success) {
+                    response.data.token = "HUnmOLZl31eaHGPYxPtwAyr1JPRtMC5EwlWNFuIseMI";
+                    window.location.href = '/api/chat/websocket' + '?token=' + response.data.token;
+                } else {
+                    errorElement.textContent = response.data.message;
+                }
+            })
+            .catch(error => {
+                errorElement.textContent = '登录失败，请重试。';
+            });
+    }
+</script>
+</body>
+</html>

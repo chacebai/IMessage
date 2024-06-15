@@ -19,12 +19,11 @@ package com.javalang.imessage.controller;
 import javax.servlet.http.HttpSession;
 
 import com.javalang.imessage.model.User;
-import lombok.val;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author <a href="mailto:chenxilzx1@gmail.com">theonefx</a>
@@ -33,7 +32,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 public class BasicController {
 
     // http://127.0.0.1:8080/html
-    @GetMapping("/html")
+    @GetMapping("/")
     public String html() {
         return "index.html";
     }
@@ -44,6 +43,11 @@ public class BasicController {
         return "login.html";
     }
 
+    @GetMapping("/loginJwt")
+    public String formtest(HttpSession session) {
+        return "loginJwt.html";
+    }
+
     // http://127.0.0.1:8080/doLogin
     @PostMapping("/doLogin")
     public String doLogin(String username, HttpSession session) {
@@ -51,8 +55,23 @@ public class BasicController {
         user1.setId(username);
         session.setAttribute("user", user1);
         User user = (User) session.getAttribute("user");
-        System.out.println("login user:" + user);
         return "redirect:/api/chat/websocket";
+    }
+
+    // http://127.0.0.1:8080/doLoginJwt
+    @ResponseBody
+    @PostMapping("/doLoginJwt")
+    public Map<String, Object> doLoginJwt(@RequestBody Map<String, String> loginData, HttpSession session) {
+        String username = loginData.get("username");
+        String password = loginData.get("password");
+
+        Map<String, Object> response = new HashMap<>();
+        User user1 = new User();
+        user1.setId(username);
+        user1.setPassword(password);
+        session.setAttribute("user", user1);
+        response.put("success", true);
+        return response;
     }
 
     @ResponseBody
@@ -61,19 +80,6 @@ public class BasicController {
         // 退出登录就是将用户信息删除
         session.removeAttribute("user");
         return "退出成功";
-    }
-
-    // http://127.0.0.1:8080/websocket用户权限
-    @RequestMapping(value = "/websocket")
-    public String websocket(HttpSession session) {
-        // 模拟各种api，访问之前都要检查有没有登录，没有登录就提示用户登录
-        User user = (User) session.getAttribute("user");
-        System.out.println("websocket user:" + user);
-        if (user == null) {
-            return "redirect:/login";
-        }
-        // 如果有登录就调用业务层执行业务逻辑，然后返回数据
-        return "websocket.html";
     }
 
 }
