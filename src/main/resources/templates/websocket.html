@@ -1,97 +1,271 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WebSocket Test</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-        }
-        #address, #message {
-            width: 300px;
-            padding: 5px;
-            margin: 5px 0;
-        }
-        button {
-            padding: 5px 10px;
-            margin: 5px 0;
-        }
-        #output {
-            margin-top: 10px;
-            border: 1px solid #ccc;
-            padding: 10px;
-            overflow-y: auto;
-        }
-    </style>
+    <meta name="description" content="WebSocket在线开发调试测试工具，支持ws和wss。">
+    <meta name="keywords" content="php,nodejs,swoole,websocket,websocket工具,swoole websocket,websocket client,ws,wss">
+    <link rel="stylesheet" href="/thirdparty/bootstrap-5.3.3/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/chat-ios.css">
 </head>
+
 <body>
-    <h1>WebSocket Test</h1>
-    <h1>欢迎, <span th:text="${user}"></span>!</h1>
-    <a href="/logout">退出</a><br>
-    <label for="address">Address:</label>
-    <input type="text" id="address" value="" placeholder="address">
-    <button id="connect">Connect</button><br>
-    <label for="message">Message:</label>
-    <input type="text" id="message" placeholder="Type your message">
-    <button id="send">Send</button>
-    <div id="output"></div>
+<header id="header" class="p-3 text-bg-dark fixed-top">
+    <div class="container">
+        <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
+            <a href="/" class="d-flex align-items-center mb-2 mb-lg-0 text-white text-decoration-none">
+                <svg class="bi me-2" width="40" height="32" role="img" aria-label="Bootstrap">
+                    <use xlink:href="#bootstrap"></use>
+                </svg>
+            </a>
 
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            // 获取当前页面的 URL
-            const currentUrl = window.location.href;
-            // 获取协议、主机名和端口号
-            const url = new URL(currentUrl);
-            const wsProtocol = url.protocol === 'https:' ? 'wss:' : 'ws:';
-            const wsUrl = `${wsProtocol}//${url.host}/chat`;
-            // 找到输入框元素
-            const addressInput = document.getElementById('address');
-            // 自动填充 WebSocket 地址到输入框中
-            if (addressInput) {
-                addressInput.value = wsUrl;
-            }
+            <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
+                <li><a href="#" class="nav-link px-2 text-secondary">主页</a></li>
+                <li><a href="#hall" class="nav-link px-2 text-white">大厅</a></li>
+                <li><a href="#friends" class="nav-link px-2 text-white">好友</a></li>
+                <li><a href="#login" class="nav-link px-2 text-white">登录</a></li>
+                <li><a href="#register" class="nav-link px-2 text-white">注册</a></li>
+            </ul>
+
+            <form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3" role="search">
+                <input type="search" class="form-control form-control-dark text-bg-dark" placeholder="Search..."
+                       aria-label="Search">
+            </form>
+
+            <div class="text-end">
+                <button type="button" class="btn btn-outline-light me-2">Login</button>
+                <button type="button" class="btn btn-warning">Sign-up</button>
+            </div>
+        </div>
+    </div>
+</header>
+
+<main id="main" role="main">
+    <!-- Main 内容 -->
+    <div id="content" class="content">
+        <!-- Chat Sections -->
+        <!-- <div class="container chat-container" id="hall"> -->
+        <div id="hall">
+            <div class="chat-box">
+                <div id="myself-message-output" class="myself-message-log">
+                    <p class="send">Hey there! What's up</p>
+                    <p class="receive">Checking out iOS7 you know..</p>
+                    <p class="send">Check out this bubble!</p>
+                    <p class="receive">It's pretty cool…</p>
+                    <p class="receive">Not gonna lie!</p>
+                    <p class="send">Yeah it's pure CSS &amp; HTML</p>
+                    <p class="receive">Wow that's impressive. But what's even more impressive is that this bubble is really
+                        high.</p>
+                    <p class="receive">Wow that's impressive. But what's even more impressive is that this bubble is really
+                        high.</p>
+                    <p class="send">Wow that's impressive. But what's even more impressive is that this bubble is really
+                        high.</p>
+                    <p class="send">Wow that's impressive. But what's even more impressive is that this bubble is really
+                        high.Wow that's impressive. But what's even more impressive is that this bubble is really high.Wow
+                        that's impressive. But what's even more impressive is that this bubble is really high.Wow that's
+                        impressive. But what's even more impressive is that this bubble is really high.Wow that's
+                        impressive. But what's even more impressive is that this bubble is really high.Wow that's
+                        impressive. But what's even more impressive is that this bubble is really high.</p>
+                    <p class="send">Wow that's impressive. But what's even more impressive is that this bubble is really
+                        high.Wow that's impressive. But what's even more impressive is that this bubble is really high.Wow
+                        that's impressive. But what's even more impressive is that this bubble is really high.Wow that's
+                        impressive. But what's even more impressive is that this bubble is really high.Wow that's
+                        impressive. But what's even more impressive is that this bubble is really high.Wow that's
+                        impressive. But what's even more impressive is that this bubble is really high.</p>
+                    <p class="send">Wow that's impressive. But what's even more impressive is that this bubble is really
+                        high.Wow that's impressive. But what's even more impressive is that this bubble is really high.Wow
+                        that's impressive. But what's even more impressive is that this bubble is really high.Wow that's
+                        impressive. But what's even more impressive is that this bubble is really high.Wow that's
+                        impressive. But what's even more impressive is that this bubble is really high.Wow that's
+                        impressive. But what's even more impressive is that this bubble is really high.</p>
+                    <p class="send">Wow that's impressive. But what's even more impressive is that this bubble is really
+                        high.Wow that's impressive. But what's even more impressive is that this bubble is really high.Wow
+                        that's impressive. But what's even more impressive is that this bubble is really high.Wow that's
+                        impressive. But what's even more impressive is that this bubble is really high.Wow that's
+                        impressive. But what's even more impressive is that this bubble is really high.Wow that's
+                        impressive. But what's even more impressive is that this bubble is really high.</p>
+                    <p class="send">Wow that's impressive. But what's even more impressive is that this bubble is really
+                        high.Wow that's impressive. But what's even more impressive is that this bubble is really high.Wow
+                        that's impressive. But what's even more impressive is that this bubble is really high.Wow that's
+                        impressive. But what's even more impressive is that this bubble is really high.Wow that's
+                        impressive. But what's even more impressive is that this bubble is really high.Wow that's
+                        impressive. But what's even more impressive is that this bubble is really high.</p>
+                    <p class="send">Wow that's impressive. But what's even more impressive is that this bubble is really
+                        high.Wow that's impressive. But what's even more impressive is that this bubble is really high.Wow
+                        that's impressive. But what's even more impressive is that this bubble is really high.Wow that's
+                        impressive. But what's even more impressive is that this bubble is really high.Wow that's
+                        impressive. But what's even more impressive is that this bubble is really high.Wow that's
+                        impressive. But what's even more impressive is that this bubble is really high.</p>
+                </div>
+            </div>
+        </div>
+        <div id="messageForm" class="fixed-bottom-form">
+            <div class="drag-bar"></div>
+            <div class="input-group">
+                <textarea id="myself-message" name="message" placeholder="Type Message ..." class="form-control"></textarea>
+                <span class="input-group-btn">
+                        <button id="myself-send" class="btn btn-primary btn-flat">发送</button>
+                    </span>
+            </div>
+        </div>
+
+        <div class="container chat-container d-none" id="friends">
+            <h3>好友</h3>
+            <div class="input-group mt-3">
+                <input type="text" class="form-control" placeholder="Type a message">
+                <div class="input-group-append">
+                    <button class="btn btn-primary">Send</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="container chat-container d-none" id="login">
+            <h3>登录</h3>
+            <!-- Login Form -->
+            <form>
+                <div class="form-group">
+                    <label for="login-email">Email address</label>
+                    <input type="email" class="form-control" id="login-email" placeholder="Enter email">
+                </div>
+                <div class="form-group">
+                    <label for="login-password">Password</label>
+                    <input type="password" class="form-control" id="login-password" placeholder="Password">
+                </div>
+                <button type="submit" class="btn btn-primary">登录</button>
+            </form>
+        </div>
+
+        <div class="container chat-container d-none" id="register">
+            <h3>注册</h3>
+            <!-- Register Form -->
+            <form>
+                <div class="form-group">
+                    <label for="register-email">Email address</label>
+                    <input type="email" class="form-control" id="register-email" placeholder="Enter email">
+                </div>
+                <div class="form-group">
+                    <label for="register-password">Password</label>
+                    <input type="password" class="form-control" id="register-password" placeholder="Password">
+                </div>
+                <button type="submit" class="btn btn-primary">注册</button>
+            </form>
+        </div>
+    </div>
+</main>
+
+<footer id="footer">
+    <p>广播消息</p>
+</footer>
+
+<script>
+    // 点击跳转
+    document.querySelectorAll('.nav-link').forEach(function (link) {
+        link.addEventListener('click', function () {
+            document.querySelectorAll('.chat-container').forEach(function (container) {
+                container.classList.add('d-none');
+            });
+            document.querySelector(link.getAttribute('href')).classList.remove('d-none');
+        });
+    });
+</script>
+
+<script>
+    function adjustBodyPadding() {
+        // 调整导航栏不要覆盖body
+        const headerHeight = document.getElementById('header').offsetHeight;
+        document.body.style.paddingTop = headerHeight + 'px';
+        // 调整聊天框高度
+        const footerHeight = document.getElementById('footer').offsetHeight;
+        const formHeight = document.getElementById('messageForm').offsetHeight;
+        const chatBox = document.getElementsByClassName("chat-box");
+        chatBox[0].style.height = `calc(100vh - ${headerHeight}px - ${footerHeight}px - ${formHeight}px)`;
+        chatBox[0].scrollTop = chatBox[0].scrollHeight;
+    }
+    document.addEventListener('DOMContentLoaded', adjustBodyPadding);
+    window.addEventListener('resize', adjustBodyPadding);
+
+    // 调整输入消息框大小
+    document.addEventListener('DOMContentLoaded', function () {
+        let dragBar = document.querySelector('.drag-bar');
+        let textarea = document.querySelector('.fixed-bottom-form .form-control');
+        let startY, startHeight;
+
+        dragBar.addEventListener('mousedown', function (e) {
+            startY = e.clientY;
+            startHeight = parseInt(document.defaultView.getComputedStyle(textarea).height, 10);
+            document.documentElement.addEventListener('mousemove', doDrag, false);
+            document.documentElement.addEventListener('mouseup', stopDrag, false);
         });
 
-        let socket;
-        document.getElementById('connect').addEventListener('click', () => {
-            const address = document.getElementById('address').value;
-            socket = new WebSocket(address);
-
-            socket.onopen = function(event) {
-                log('Connected to ' + address);
-            };
-
-            socket.onmessage = function(event) {
-                log('Received: ' + event.data);
-            };
-
-            socket.onclose = function(event) {
-                log('Disconnected from ' + address);
-            };
-
-            socket.onerror = function(event) {
-                log('Error: ' + event);
-            };
-        });
-
-        document.getElementById('send').addEventListener('click', () => {
-            const message = document.getElementById('message').value;
-            if (socket && socket.readyState === WebSocket.OPEN) {
-                socket.send(message);
-                //log('Sent: ' + message);
-            } else {
-                log('WebSocket is not connected.');
-            }
-        });
-
-        function log(message) {
-            const output = document.getElementById('output');
-            const p = document.createElement('p');
-            p.textContent = message;
-            output.appendChild(p);
+        function doDrag(e) {
+            var newHeight = startHeight + (startY - e.clientY);
+            textarea.style.height = newHeight + 'px';
+            adjustBodyPadding();
         }
-    </script>
+
+        function stopDrag() {
+            document.documentElement.removeEventListener('mousemove', doDrag, false);
+            document.documentElement.removeEventListener('mouseup', stopDrag, false);
+        }
+    });
+
+    let socket;
+    function connectWebSocket() {
+        // 获取当前页面的 URL
+        // const currentUrl = window.location.href;
+        const currentUrl = "http://127.0.0.1:8080/api/chat/websocket";
+        // 获取协议、主机名和端口号
+        const url = new URL(currentUrl);
+        const wsProtocol = url.protocol === 'https:' ? 'wss:' : 'ws:';
+        const addressWsUrl = `${wsProtocol}//${url.host}/chat`;
+        socket = new WebSocket(addressWsUrl);
+
+        socket.onopen = function (event) {
+            log('Connected to ' + addressWsUrl, 0);
+        };
+
+        socket.onmessage = function (event) {
+            log('Received: ' + event.data, 1);
+        };
+
+        socket.onclose = function (event) {
+            log('Disconnected from ' + addressWsUrl, 0);
+        };
+
+        socket.onerror = function (event) {
+            log('Error: ' + event, 0);
+        };
+    }
+    connectWebSocket();
+
+    document.getElementById('connect')?.addEventListener('click', connectWebSocket);
+
+    document.getElementById('myself-send').addEventListener('click', () => {
+        const message = document.getElementById('myself-message').value;
+        if (socket && socket.readyState === WebSocket.OPEN) {
+            socket.send(message);
+            log('Sent: ' + message, 0);
+        } else {
+            log('WebSocket is not connected.', 0);
+        }
+    });
+
+    function log(message, sender) {
+        const output = document.getElementById('myself-message-output');
+        const p = document.createElement('p');
+        let senderClass = sender || "system";
+        if (sender === 0) senderClass = "send";
+        else if (sender === 1) senderClass = "receive";
+        else if (sender === 2) senderClass = "system";
+        else senderClass = "unknown";
+        p.classList.add(senderClass);
+        p.textContent = message;
+        output.appendChild(p);
+        adjustBodyPadding();
+    }
+</script>
+
 </body>
 </html>

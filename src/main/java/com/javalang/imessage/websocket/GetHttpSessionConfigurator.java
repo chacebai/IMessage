@@ -2,12 +2,14 @@ package com.javalang.imessage.websocket;
 
 import com.javalang.imessage.model.User;
 import com.javalang.imessage.utils.UserThreadLocal;
+import lombok.extern.slf4j.Slf4j;
 
 import javax.servlet.http.HttpSession;
 import javax.websocket.HandshakeResponse;
 import javax.websocket.server.HandshakeRequest;
 import javax.websocket.server.ServerEndpointConfig;
 
+@Slf4j
 public class GetHttpSessionConfigurator extends ServerEndpointConfig.Configurator {
     @Override
     public void modifyHandshake(ServerEndpointConfig config, HandshakeRequest request, HandshakeResponse response) {
@@ -23,7 +25,7 @@ public class GetHttpSessionConfigurator extends ServerEndpointConfig.Configurato
             config.getUserProperties().put(HttpSession.class.getName(), httpSession);
         } else {
             // 记录错误或采取其他措施
-            //System.err.println("HTTP session is null during WebSocket handshake");
+            log.warn("HTTP session is null during WebSocket handshake");
         }
     }
 }

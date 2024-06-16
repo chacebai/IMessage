@@ -9,7 +9,6 @@ import org.springframework.stereotype.Component;
 import javax.servlet.http.HttpSession;
 import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
-import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -29,7 +28,7 @@ public class ChatEndPoint {
     public void onMessage(String message, Session session) {
         log.info("当前的用户：" + session.getId());
         log.info("接收的长度：" + message.length());
-        log.info("在线用户:" + onlineUsers.size());
+        log.info("在线用户数:" + onlineUsers.size());
         // 遍历Map并输出键值对
         for (Map.Entry<String, ChatEndPoint> entry : onlineUsers.entrySet()) {
             String username = entry.getKey();
@@ -100,14 +99,20 @@ public class ChatEndPoint {
                 broadcastAllUsers(message);
             } else {
                 try {
-                    session.close(new CloseReason(CloseReason.CloseCodes.VIOLATED_POLICY, "Unauthorized"));
+                    if (session != null)
+                        session.close(new CloseReason(CloseReason.CloseCodes.VIOLATED_POLICY, "Unauthorized"));
+                    else
+                        log.warn("session is null");
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
         } else {
             try {
-                session.close(new CloseReason(CloseReason.CloseCodes.VIOLATED_POLICY, "Unauthorized2"));
+                if (session != null)
+                    session.close(new CloseReason(CloseReason.CloseCodes.VIOLATED_POLICY, "Unauthorized2"));
+                else
+                    log.warn("session is null");
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -116,7 +121,7 @@ public class ChatEndPoint {
 
     @OnClose
     public void onClose(Session session, CloseReason reason) {
-        System.out.println("连接关闭了。。。");
+        log.info("连接关闭了。。。");
         //获取用户名
         User user = (User) httpSession.getAttribute("user");
         if (user != null) {

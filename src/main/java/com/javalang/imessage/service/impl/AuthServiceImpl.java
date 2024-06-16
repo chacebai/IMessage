@@ -5,7 +5,6 @@ import com.javalang.imessage.dto.ResponseResult;
 import com.javalang.imessage.dto.ResultT;
 import com.javalang.imessage.model.User;
 import com.javalang.imessage.service.AuthService;
-import com.javalang.imessage.utils.JwtUtil;
 import com.javalang.imessage.utils.KeyPrefixAdder;
 import com.javalang.imessage.utils.RedisUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -42,12 +41,9 @@ public class AuthServiceImpl implements AuthService {
         } else {
             try {
                 redisUtils.set(userId, mapper.writeValueAsString(user));
-                // 创建JWT token
-                String token = JwtUtil.generateToken(user.getId());
                 // 包装用户数据和token
                 Map<String, Object> responseData = new HashMap<>();
                 responseData.put("user", user);
-                responseData.put("token", token);
                 return ResponseResult.success(responseData);
             } catch (Exception e) {
                 log.error("{error:}|" + e.toString());
@@ -65,12 +61,9 @@ public class AuthServiceImpl implements AuthService {
             try {
                 String userJson = (String) redisUtils.get(userId);
                 User user = mapper.readValue(userJson, User.class);
-                // 创建JWT token
-                String token = JwtUtil.generateToken(user.getId());
                 // 包装用户数据和token
                 Map<String, Object> responseData = new HashMap<>();
                 responseData.put("user", user);
-                responseData.put("token", token);
                 return ResponseResult.success(responseData);
             } catch (Exception e) {
                 log.error("{error:}|" + e.toString());

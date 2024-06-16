@@ -6,7 +6,6 @@ import com.javalang.imessage.dto.ResultT;
 import com.javalang.imessage.model.User;
 import com.javalang.imessage.model.UserApply;
 import com.javalang.imessage.service.UserService;
-import com.javalang.imessage.utils.JwtUtil;
 import com.javalang.imessage.utils.KeyPrefixAdder;
 import com.javalang.imessage.utils.RedisUtils;
 import com.javalang.imessage.utils.UserThreadLocal;
@@ -23,19 +22,6 @@ public class UserServiceImpl implements UserService {
     public UserServiceImpl(ObjectMapper mapper, RedisUtils redisUtils) {
         this.mapper = mapper;
         this.redisUtils = redisUtils;
-    }
-
-    @Override
-    public User checkToken(String token) {
-        try {
-            String userId = JwtUtil.getUsernameFromToken(token);
-            userId = KeyPrefixAdder.addUserPrefix(userId);
-            String userJson = (String) redisUtils.get(userId);
-            return mapper.readValue(userJson, User.class);
-        } catch (Exception e) {
-            log.error("{error:}|" + e.toString());
-            return null;
-        }
     }
 
     @Override

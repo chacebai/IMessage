@@ -4,7 +4,6 @@ import com.javalang.imessage.dto.ResultT;
 import com.javalang.imessage.model.User;
 
 public interface UserService {
-    User checkToken(String token);
     ResultT<User> applyFriend(String friendId);
     ResultT<User> deleteFriend();
     ResultT<User> agreeFriend();

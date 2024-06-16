@@ -43,11 +43,6 @@ public class BasicController {
         return "login.html";
     }
 
-    @GetMapping("/loginJwt")
-    public String formtest(HttpSession session) {
-        return "loginJwt.html";
-    }
-
     // http://127.0.0.1:8080/doLogin
     @PostMapping("/doLogin")
     public String doLogin(String username, HttpSession session) {
@@ -56,22 +51,6 @@ public class BasicController {
         session.setAttribute("user", user1);
         User user = (User) session.getAttribute("user");
         return "redirect:/api/chat/websocket";
-    }
-
-    // http://127.0.0.1:8080/doLoginJwt
-    @ResponseBody
-    @PostMapping("/doLoginJwt")
-    public Map<String, Object> doLoginJwt(@RequestBody Map<String, String> loginData, HttpSession session) {
-        String username = loginData.get("username");
-        String password = loginData.get("password");
-
-        Map<String, Object> response = new HashMap<>();
-        User user1 = new User();
-        user1.setId(username);
-        user1.setPassword(password);
-        session.setAttribute("user", user1);
-        response.put("success", true);
-        return response;
     }
 
     @ResponseBody
